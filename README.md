@@ -4,6 +4,12 @@ High-performance maze solver written in Rust.
 
 *Inspired by Dr. Mike Pound's Computerphile [video](https://www.youtube.com/watch?v=rop0W4QDOUI).*
 
+## Examples
+
+You can find some test mazes (along with their solutions) in the [Examples](Examples/) folder.
+
+They were taken from Mike Pound's [repository](https://github.com/mikepound/mazesolving).
+
 ## Building & running
 
 You will need `cargo`, which can be installed [here](https://rustup.rs/).
