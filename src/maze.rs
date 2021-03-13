@@ -1,21 +1,9 @@
+use core::cmp::Ordering;
+use core::cmp::max;
+use core::cmp::min;
+use std::collections::BinaryHeap;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::collections::BinaryHeap;
-use core::cmp::min;
-use core::cmp::max;
-use core::cmp::Ordering;
-
-fn path(prev: HashMap<u32, u32>, mut crr: u32) -> Vec<u32> {
-  let mut path = vec![crr];
-
-  while prev.contains_key(&crr) {
-    crr = *prev.get(&crr).unwrap();
-    path.push(crr);
-  }
-
-  path.reverse();
-  path
-}
 
 struct Tile {
   f: u32,
@@ -42,9 +30,7 @@ impl Ord for Tile {
   }
 }
 
-fn dst(pos: u32, target: u32, width: u32) -> u32 {
-  let width = width ;
-
+fn manhattan(pos: u32, target: u32, width: u32) -> u32 {
   let x = pos / width;
   let y = pos % width;
 
@@ -54,8 +40,8 @@ fn dst(pos: u32, target: u32, width: u32) -> u32 {
   max(x, tx) - min(x, tx) + max(y, ty) - min(y, ty)
 }
 
-pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<Vec<u32>> {
-  let img_size = width * height ;
+pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<(HashMap<u32, u32>, u32)> {
+  let img_size = width * height;
   let mut start = 0;
 
   for i in 1 .. width - 1 {
@@ -73,7 +59,7 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<Vec<u32>> {
 
   for i in width * (height - 1) + 1 .. width * height - 1 {
     if pixels[i as usize] == 255 {
-      end = i ;
+      end = i;
       break
     }
   }
@@ -84,12 +70,13 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<Vec<u32>> {
 
   let mut seen = HashSet::<u32>::new();
   let mut prev = HashMap::<u32, u32>::new();
+  prev.insert(start, 0);
 
   let mut g = HashMap::<u32, u32>::new();
   g.insert(start, 0);
 
   let mut f = HashMap::<u32, u32>::new();
-  f.insert(start, dst(start, end, width));
+  f.insert(start, manhattan(start, end, width));
 
   let mut heap = BinaryHeap::<Tile>::new();
   heap.push(Tile { pos: start, f: *f.get(&start).unwrap_or(&u32::MAX) });
@@ -100,26 +87,28 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<Vec<u32>> {
     seen.insert(pos);
 
     if pos == end {
-      return Some(path(prev, pos));
+      return Some((prev, pos));
     }
 
-    let up = pos - width ;
-    let down = pos + width ;
+    let up = pos - width;
+    let down = pos + width;
     let left = pos - 1;
     let right = pos + 1;
 
     for &node in &[up, down, left, right] {
       if node < img_size && pixels[node as usize] != 0 {
         let g_ = g[&pos] + 1;
+
         if !g.contains_key(&node) || g_ < g[&node] {
-          prev.insert(node, pos);
           g.insert(node, g_);
-          f.insert(node, g_ + dst(node, end, width));
-          heap.push(Tile { pos: node, f: f[&node] });
+          f.insert(node, g_ + manhattan(node, end, width));
+
+          prev.insert(node, pos);
+          heap.push(Tile { pos: node, f: f[&node] })
         }
       }
     }
   }
 
-  return None;
+  None
 }
