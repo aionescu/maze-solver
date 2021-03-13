@@ -3,7 +3,6 @@ use core::cmp::max;
 use core::cmp::min;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
-use std::collections::HashSet;
 
 struct Tile {
   f: u32,
@@ -68,7 +67,6 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<(HashMap<u32, u32
     panic!("No empty pixel on last line.");
   }
 
-  let mut seen = HashSet::<u32>::new();
   let mut prev = HashMap::<u32, u32>::new();
   prev.insert(start, 0);
 
@@ -84,7 +82,6 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<(HashMap<u32, u32
   while !heap.is_empty() {
     let node = heap.pop().unwrap();
     let pos = node.pos;
-    seen.insert(pos);
 
     if pos == end {
       return Some((prev, pos));
