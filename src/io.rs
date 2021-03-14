@@ -24,7 +24,11 @@ pub fn save_solved(width: u32, height: u32, pixels: Vec<u8>, path: &str) {
     let stem = path.file_stem().unwrap().to_str().unwrap();
     let ext = path.extension().unwrap().to_str().unwrap();
 
-    format!("{}/{}-Solved.{}", parent, stem, ext)
+    if !parent.is_empty() {
+      format!("{}/{}-Solved.{}", parent, stem, ext)
+    } else {
+      format!("{}-Solved.{}", stem, ext)
+    }
   }
 
   let img = image::GrayImage::from_raw(width, height, pixels).unwrap();
