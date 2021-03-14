@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::path::Path;
 use image;
 
@@ -16,29 +15,6 @@ pub fn load_luma8_parts(path: &str) -> (u32, u32, Vec<u8>) {
   let pixels = img.into_raw();
 
   (width, height, pixels)
-}
-
-pub fn draw_path(pixels: &mut Vec<u8>, prev: &HashMap<u32, u32>, end: u32) {
-  let mut crr = end;
-  let mut path_length = 0;
-
-  while prev.contains_key(&crr) {
-    path_length += 1;
-    crr = prev[&crr];
-  }
-
-  let mut color = 64.0;
-  let step = 128.0 / path_length as f64;
-
-  crr = end;
-
-  for _ in 0 .. path_length {
-    pixels[crr as usize] = color as u8;
-    color += step;
-    crr = prev[&crr];
-  }
-
-  pixels[crr as usize] = color as u8;
 }
 
 pub fn save_solved(width: u32, height: u32, pixels: Vec<u8>, path: &str) {
