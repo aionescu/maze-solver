@@ -17,20 +17,20 @@ pub fn load_luma8_parts(path: &str) -> (u32, u32, Vec<u8>) {
   (width, height, pixels)
 }
 
-pub fn save_solved(width: u32, height: u32, pixels: Vec<u8>, path: &str) {
-  fn append_solved(path: &str) -> String {
-    let path = Path::new(&path);
-    let parent = path.parent().unwrap().to_str().unwrap();
-    let stem = path.file_stem().unwrap().to_str().unwrap();
-    let ext = path.extension().unwrap().to_str().unwrap();
+fn append_solved(path: &str) -> String {
+  let path = Path::new(&path);
+  let parent = path.parent().unwrap().to_str().unwrap();
+  let stem = path.file_stem().unwrap().to_str().unwrap();
+  let ext = path.extension().unwrap().to_str().unwrap();
 
-    if !parent.is_empty() {
-      format!("{}/{}-Solved.{}", parent, stem, ext)
-    } else {
-      format!("{}-Solved.{}", stem, ext)
-    }
+  if !parent.is_empty() {
+    format!("{}/{}-Solved.{}", parent, stem, ext)
+  } else {
+    format!("{}-Solved.{}", stem, ext)
   }
+}
 
+pub fn save_solved(width: u32, height: u32, pixels: Vec<u8>, path: &str) {
   let img = image::GrayImage::from_raw(width, height, pixels).unwrap();
   let solution_path = append_solved(path);
 

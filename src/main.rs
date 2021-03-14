@@ -1,8 +1,10 @@
 mod io;
-mod maze;
+mod parser;
+mod solver;
 
 use crate::io::*;
-use crate::maze::*;
+use crate::parser::*;
+use crate::solver::*;
 
 fn main() {
   let img_path =
