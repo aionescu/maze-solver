@@ -18,16 +18,7 @@ pub fn load_luma8_parts(path: &str) -> (u32, u32, Vec<u8>) {
   (width, height, pixels)
 }
 
-fn append_solved(path: &str) -> String {
-  let path = Path::new(&path);
-  let parent = path.parent().unwrap();
-  let stem = path.file_stem().unwrap().to_str().unwrap();
-  let ext = path.extension().unwrap().to_str().unwrap();
-
-  format!("{}/{}-Solved.{}", parent.display(), stem, ext)
-}
-
-pub fn draw_and_save(width: u32, height: u32, mut pixels: Vec<u8>, path: &str, prev: &HashMap<u32, u32>, end: u32) {
+pub fn draw_path(pixels: &mut Vec<u8>, prev: &HashMap<u32, u32>, end: u32) {
   let mut crr = end;
   let mut path_length = 0;
 
@@ -46,7 +37,21 @@ pub fn draw_and_save(width: u32, height: u32, mut pixels: Vec<u8>, path: &str, p
     color += step;
     crr = prev[&crr];
   }
+}
 
-  let img = image::GrayImage::from_raw(width , height , pixels).unwrap();
-  img.save(&append_solved(path)).unwrap()
+pub fn save_solved(width: u32, height: u32, pixels: Vec<u8>, path: &str) {
+  fn append_solved(path: &str) -> String {
+    let path = Path::new(&path);
+    let parent = path.parent().unwrap().to_str().unwrap();
+    let stem = path.file_stem().unwrap().to_str().unwrap();
+    let ext = path.extension().unwrap().to_str().unwrap();
+
+    format!("{}/{}-Solved.{}", parent, stem, ext)
+  }
+
+  let img = image::GrayImage::from_raw(width, height, pixels).unwrap();
+  let solution_path = append_solved(path);
+
+  img.save(&solution_path).unwrap();
+  println!("Solution saved to {}.", solution_path)
 }

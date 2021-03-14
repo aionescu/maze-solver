@@ -39,7 +39,7 @@ fn manhattan(pos: u32, target: u32, width: u32) -> u32 {
   max(x, tx) - min(x, tx) + max(y, ty) - min(y, ty)
 }
 
-pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<(HashMap<u32, u32>, u32)> {
+pub fn solve(width: u32, height: u32, pixels: &[u8]) -> (HashMap<u32, u32>, u32) {
   let img_size = width * height;
   let mut start = 0;
 
@@ -84,7 +84,7 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<(HashMap<u32, u32
     let pos = node.pos;
 
     if pos == end {
-      return Some((prev, pos));
+      return (prev, pos);
     }
 
     let up = pos - width;
@@ -107,5 +107,5 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> Option<(HashMap<u32, u32
     }
   }
 
-  None
+  panic!("No path found.")
 }
