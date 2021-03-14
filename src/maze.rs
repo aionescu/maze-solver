@@ -3,17 +3,17 @@ use std::collections::BinaryHeap;
 use std::collections::HashMap;
 
 pub struct Maze {
-  start: u32,
+  pub start: u32,
   pub end: u32,
 
-  up_idx: HashMap<u32, u32>,
-  down_idx: HashMap<u32, u32>,
-  left_idx: HashMap<u32, u32>,
-  right_idx: HashMap<u32, u32>,
+  pub up_idx: HashMap<u32, u32>,
+  pub down_idx: HashMap<u32, u32>,
+  pub left_idx: HashMap<u32, u32>,
+  pub right_idx: HashMap<u32, u32>,
 
-  up_dst: HashMap<u32, u32>,
-  left_dst: HashMap<u32, u32>,
-  end_dst: HashMap<u32, u32>
+  pub up_dst: HashMap<u32, u32>,
+  pub left_dst: HashMap<u32, u32>,
+  pub end_dst: HashMap<u32, u32>
 }
 
 pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
