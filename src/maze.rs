@@ -4,26 +4,26 @@ use core::cmp::min;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
 
-struct Tile {
+struct Node {
   f: u32,
   pos: u32
 }
 
-impl PartialEq for Tile {
+impl PartialEq for Node {
   fn eq(&self, rhs: &Self) -> bool {
     self.f == rhs.f && self.pos == rhs.pos
   }
 }
 
-impl Eq for Tile { }
+impl Eq for Node { }
 
-impl PartialOrd for Tile {
+impl PartialOrd for Node {
   fn partial_cmp(&self, rhs: &Self) -> Option<Ordering> {
     Some(self.cmp(rhs))
   }
 }
 
-impl Ord for Tile {
+impl Ord for Node {
   fn cmp(&self, rhs: &Self) -> Ordering {
     rhs.f.cmp(&self.f).then_with(|| self.pos.cmp(&rhs.pos))
   }
@@ -67,17 +67,16 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> (HashMap<u32, u32>, u32)
     panic!("No empty pixel on last line.");
   }
 
-  let mut prev = HashMap::<u32, u32>::new();
-  prev.insert(start, 0);
+  let mut prev = HashMap::new();
 
-  let mut g = HashMap::<u32, u32>::new();
+  let mut g = HashMap::new();
   g.insert(start, 0);
 
-  let mut f = HashMap::<u32, u32>::new();
+  let mut f = HashMap::new();
   f.insert(start, manhattan(start, end, width));
 
-  let mut heap = BinaryHeap::<Tile>::new();
-  heap.push(Tile { pos: start, f: *f.get(&start).unwrap_or(&u32::MAX) });
+  let mut heap = BinaryHeap::new();
+  heap.push(Node { pos: start, f: *f.get(&start).unwrap_or(&u32::MAX) });
 
   while !heap.is_empty() {
     let node = heap.pop().unwrap();
@@ -101,7 +100,7 @@ pub fn solve(width: u32, height: u32, pixels: &[u8]) -> (HashMap<u32, u32>, u32)
           f.insert(node, g_ + manhattan(node, end, width));
 
           prev.insert(node, pos);
-          heap.push(Tile { pos: node, f: f[&node] })
+          heap.push(Node { pos: node, f: f[&node] })
         }
       }
     }

@@ -28,7 +28,7 @@ pub fn draw_path(pixels: &mut Vec<u8>, prev: &HashMap<u32, u32>, end: u32) {
   }
 
   let mut color = 64.0;
-  let step = 128.0 / (path_length - 1) as f64;
+  let step = 128.0 / path_length as f64;
 
   crr = end;
 
@@ -37,6 +37,8 @@ pub fn draw_path(pixels: &mut Vec<u8>, prev: &HashMap<u32, u32>, end: u32) {
     color += step;
     crr = prev[&crr];
   }
+
+  pixels[crr as usize] = color as u8;
 }
 
 pub fn save_solved(width: u32, height: u32, pixels: Vec<u8>, path: &str) {
