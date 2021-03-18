@@ -2,9 +2,23 @@ mod io;
 mod parser;
 mod solver;
 
+use std::time::Instant;
+
 use crate::io::*;
 use crate::parser::*;
 use crate::solver::*;
+
+macro_rules! timed {
+  ($s:expr, $e:expr) => {
+    {
+      let now = Instant::now();
+      let r = $e;
+      let elapsed = now.elapsed();
+      println!("{} took {:?}.", $s, elapsed);
+      r
+    }
+  }
+}
 
 fn main() {
   let img_path =
@@ -12,13 +26,17 @@ fn main() {
     .nth(1)
     .expect("Please specify the maze file as a command-line argument.");
 
-  let (width, height, mut pixels) = load_luma8_parts(&img_path);
+  let solution_path = timed!("Total", {
+    let (width, height, mut pixels) = timed!("Loading", load_luma8_parts(&img_path));
 
-  let maze = parse(width, height, &pixels);
-  let prev = solve(&maze);
+    let maze = timed!("Parsing", parse(width, height, &pixels));
+    let prev = timed!("Solving", solve(&maze));
 
-  let (path, path_length) = make_path(&maze, width, &prev);
-  draw_path(&mut pixels, &path, path_length, maze.end);
+    let (path, path_length) = timed!("Creating path", make_path(&maze, width, &prev));
+    timed!("Drawing path", draw_path(&mut pixels, &path, path_length, maze.end));
 
-  save_solved(width, height, pixels, &img_path)
+    timed!("Saving", save_solved(width, height, pixels, &img_path))
+  });
+
+  println!("Solution saved to {}.", solution_path);
 }

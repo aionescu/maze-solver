@@ -30,10 +30,10 @@ fn append_solved(path: &str) -> String {
   }
 }
 
-pub fn save_solved(width: u32, height: u32, pixels: Vec<u8>, path: &str) {
+pub fn save_solved(width: u32, height: u32, pixels: Vec<u8>, path: &str) -> String {
   let img = image::GrayImage::from_raw(width, height, pixels).unwrap();
   let solution_path = append_solved(path);
 
   img.save(&solution_path).unwrap();
-  println!("Solution saved to {}.", solution_path)
+  solution_path
 }
