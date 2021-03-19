@@ -4,18 +4,11 @@ use std::collections::HashMap;
 
 use crate::parser::*;
 
+#[derive(PartialEq, Eq)]
 struct Entry {
   f: u32,
   idx: u32
 }
-
-impl PartialEq for Entry {
-  fn eq(&self, rhs: &Self) -> bool {
-    self.f == rhs.f && self.idx == rhs.idx
-  }
-}
-
-impl Eq for Entry { }
 
 impl PartialOrd for Entry {
   fn partial_cmp(&self, rhs: &Self) -> Option<Ordering> {
