@@ -25,6 +25,8 @@ fn first_empty_pixel(pixels: &[u8], start_idx: usize, end_idx: usize) -> u32 {
 }
 
 pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
+  let max_y = width - 1;
+
   let width = width as usize;
   let height = height as usize;
   let img_size = width * height;
@@ -69,7 +71,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
     down += 1;
     y += 1;
 
-    if right % width == 0 {
+    if y == max_y {
       if down == img_size - 1 {
         break
       }
