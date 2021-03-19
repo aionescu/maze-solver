@@ -29,11 +29,11 @@ fn main() {
   let solution_path = timed!("Total", {
     let (width, height, mut pixels) = timed!("Loading", load_luma8_parts(&img_path));
 
-    let maze = timed!("Parsing", parse(width, height, &pixels));
-    let prev = timed!("Solving", solve(&maze));
+    let (nodes, end) = timed!("Parsing", parse(width, height, &pixels));
+    let prev = timed!("Solving", solve(&nodes));
 
-    let (path, path_length) = timed!("Creating path", make_path(&maze, width, &prev));
-    timed!("Drawing path", draw_path(&mut pixels, &path, path_length, maze.end));
+    let (path, path_length) = timed!("Creating path", make_path(width, &nodes, &prev));
+    timed!("Drawing path", draw_path(&mut pixels, &path, path_length, end));
 
     timed!("Saving", save_solved(width, height, pixels, &img_path))
   });

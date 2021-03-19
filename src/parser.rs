@@ -1,17 +1,15 @@
 use std::collections::HashMap;
 
-pub struct Maze {
-  pub start: u32,
-  pub end: u32,
+#[derive(Default, Clone, Copy)]
+pub struct Node {
+  pub up_idx: u32,
+  pub down_idx: u32,
+  pub left_idx: u32,
+  pub right_idx: u32,
 
-  pub up_idx: HashMap<u32, u32>,
-  pub down_idx: HashMap<u32, u32>,
-  pub left_idx: HashMap<u32, u32>,
-  pub right_idx: HashMap<u32, u32>,
-
-  pub up_dst: HashMap<u32, u32>,
-  pub left_dst: HashMap<u32, u32>,
-  pub end_dst: HashMap<u32, u32>
+  pub up_dst: u32,
+  pub left_dst: u32,
+  pub end_dst: u32
 }
 
 fn first_empty_pixel(pixels: &[u8], start_idx: usize, end_idx: usize) -> u32 {
@@ -24,7 +22,7 @@ fn first_empty_pixel(pixels: &[u8], start_idx: usize, end_idx: usize) -> u32 {
   panic!("Invalid maze.")
 }
 
-pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
+pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
   let max_y = width - 1;
 
   let width = width as usize;
@@ -38,22 +36,14 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
   let end_y = end % width as u32;
   let y_diff = (start as i32 - end_y as i32).abs() as u32;
 
+  let mut nodes = vec![Node::default()];
+
   let mut top_nodes = HashMap::new();
   let mut left_node = 0u32;
+  let mut left_node_idx = 0u32;
 
-  let mut up_idx = HashMap::new();
-  let mut down_idx = HashMap::new();
-  let mut left_idx = HashMap::new();
-  let mut right_idx = HashMap::new();
-
-  let mut up_dst = HashMap::new();
-  let mut left_dst = HashMap::new();
-  let mut end_dst = HashMap::new();
-
-  end_dst.insert(start, end_x + y_diff);
-  end_dst.insert(end, 0);
-
-  top_nodes.insert(start, (start, 0));
+  nodes.push(Node { end_dst: end_x + y_diff, ..Node::default() });
+  top_nodes.insert(start, (1, 0));
 
   let mut crr = width;
   let mut left = crr - 1;
@@ -100,53 +90,57 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
       continue
     }
 
+    let mut new_node = Node::default();
+    let new_node_idx = nodes.len() as u32;
+
     if up_white {
-      let (top_node, top_x) = top_nodes[&y];
+      let (top_node_idx, top_x) = top_nodes[&y];
 
-      up_idx.insert(crr as u32, top_node);
-      down_idx.insert(top_node, crr as u32);
+      new_node.up_idx = top_node_idx;
+      nodes[top_node_idx as usize].down_idx = new_node_idx;
 
-      up_dst.insert(crr as u32, x - top_x);
+      new_node.up_dst = x - top_x
     }
 
     if down_white {
-      top_nodes.insert(y, (crr as u32, x));
+      top_nodes.insert(y, (new_node_idx, x));
     }
 
     if left_white {
-      left_idx.insert(crr as u32, left_node);
-      right_idx.insert(left_node, crr as u32);
-      left_dst.insert(crr as u32, crr as u32 - left_node);
+      new_node.left_idx = left_node;
+      nodes[left_node as usize].right_idx = new_node_idx;
+
+      new_node.left_dst = crr as u32 - left_node_idx
     }
 
     if right_white {
-      left_node = crr as u32;
+      left_node = new_node_idx;
+      left_node_idx = crr as u32
     }
 
     let y_diff = (end_y as i32 - y as i32).abs() as u32;
-    end_dst.insert(crr as u32, end_x - x + y_diff);
+    new_node.end_dst = end_x - x + y_diff;
+
+    nodes.push(new_node)
   }
+
+  let mut end_node = Node {
+    end_dst: 0,
+    ..Node::default()
+  };
+
+  let end_node_idx = nodes.len() as u32;
 
   if pixels[end as usize - width] != 0 {
-    let (top_node, top_x) = top_nodes[&end_y];
+    let (top_node_idx, top_x) = top_nodes[&end_y];
 
-    up_idx.insert(end, top_node);
-    down_idx.insert(top_node, end);
+    end_node.up_idx = top_node_idx;
+    nodes[top_node_idx as usize].down_idx = end_node_idx;
 
-    up_dst.insert(end, end_x - top_x);
+    end_node.up_dst = end_x - top_x;
   }
 
-  Maze {
-    start,
-    end,
+  nodes.push(end_node);
 
-    up_idx,
-    down_idx,
-    left_idx,
-    right_idx,
-
-    up_dst,
-    left_dst,
-    end_dst
-  }
+  (nodes, end)
 }
