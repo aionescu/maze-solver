@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
 for file in `find Examples -type f | egrep -v 'Solved'`; do
-  cargo run --release -- "$file"
+  echo "Solving $file"
+  cargo run --quiet --release -- "$file" > /dev/null
 done
