@@ -60,58 +60,66 @@ pub fn solve(maze: &Maze) -> HashMap<u32, (u32, Dir)> {
   let mut heap = BinaryHeap::new();
   heap.push(Node { idx: start, f: end_dst[&start] });
 
-  loop {
-    if heap.is_empty() {
-      break
-    }
-
-    let Node{ idx: crr, .. } = heap.pop().unwrap();
-
+  while let Some(Node{ idx: crr, .. }) = heap.pop() {
     if crr == end {
-      return prev;
+      return prev
     }
+
+    let g_crr = g[&crr];
 
     if let Some(&up) = up_idx.get(&crr) {
-      let new_g = g[&crr] + up_dst[&crr];
+      let new_g = g_crr + up_dst[&crr];
 
-      if !g.contains_key(&up) || new_g < g[&up] {
-        g.insert(up, new_g);
+      match g.get(&up) {
+        Some(&g_) if g_ <= new_g => {},
+        _ => {
+          g.insert(up, new_g);
 
-        prev.insert(up, (crr, Dir::Down));
-        heap.push(Node { idx: up, f: new_g + end_dst[&up] });
+          prev.insert(up, (crr, Dir::Down));
+          heap.push(Node { idx: up, f: new_g + end_dst[&up] })
+        }
       }
     }
 
     if let Some(&down) = down_idx.get(&crr) {
-      let new_g = g[&crr] + up_dst[&down];
+      let new_g = g_crr + up_dst[&down];
 
-      if !g.contains_key(&down) || new_g < g[&down] {
-        g.insert(down, new_g);
+      match g.get(&down) {
+        Some(&g_) if g_ <= new_g => {},
+        _ => {
+          g.insert(down, new_g);
 
-        prev.insert(down, (crr, Dir::Up));
-        heap.push(Node { idx: down, f: new_g + end_dst[&down] });
+          prev.insert(down, (crr, Dir::Up));
+          heap.push(Node { idx: down, f: new_g + end_dst[&down] })
+        }
       }
     }
 
     if let Some(&left) = left_idx.get(&crr) {
-      let new_g = g[&crr] + left_dst[&crr];
+      let new_g = g_crr + left_dst[&crr];
 
-      if !g.contains_key(&left) || new_g < g[&left] {
-        g.insert(left, new_g);
+      match g.get(&left) {
+        Some(&g_) if g_ <= new_g => {},
+        _ => {
+          g.insert(left, new_g);
 
-        prev.insert(left, (crr, Dir::Right));
-        heap.push(Node { idx: left, f: new_g + end_dst[&left] });
+          prev.insert(left, (crr, Dir::Right));
+          heap.push(Node { idx: left, f: new_g + end_dst[&left] })
+        }
       }
     }
 
     if let Some(&right) = right_idx.get(&crr) {
-      let new_g = g[&crr] + left_dst[&right];
+      let new_g = g_crr + left_dst[&right];
 
-      if !g.contains_key(&right) || new_g < g[&right] {
-        g.insert(right, new_g);
+      match g.get(&right) {
+        Some(&g_) if g_ <= new_g => {},
+        _ => {
+          g.insert(right, new_g);
 
-        prev.insert(right, (crr, Dir::Left));
-        heap.push(Node { idx: right, f: new_g + end_dst[&right] });
+          prev.insert(right, (crr, Dir::Left));
+          heap.push(Node { idx: right, f: new_g + end_dst[&right] })
+        }
       }
     }
   }
