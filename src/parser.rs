@@ -30,10 +30,11 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
   let img_size = width * height;
 
   let start = first_empty_pixel(pixels, 1, width - 1);
-  let end = first_empty_pixel(pixels, img_size - height + 1, img_size - 1);
+  let end = first_empty_pixel(pixels, img_size - width + 1, img_size - 1);
 
   let end_x = height as u32 - 1;
   let end_y = end % width as u32;
+  let y_diff = (start as i32 - end_y as i32).abs() as u32;
 
   let mut top_nodes = HashMap::new();
   let mut left_node = 0u32;
@@ -47,7 +48,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
   let mut left_dst = HashMap::new();
   let mut end_dst = HashMap::new();
 
-  end_dst.insert(start, end_x + end_y);
+  end_dst.insert(start, end_x + y_diff);
   end_dst.insert(end, 0);
 
   top_nodes.insert(start, (start, 0));
@@ -68,11 +69,11 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
     down += 1;
     y += 1;
 
-    if down == img_size - 1 {
-      break
-    }
-
     if right % width == 0 {
+      if down == img_size - 1 {
+        break
+      }
+
       crr += 1;
       left += 1;
       right += 1;
@@ -124,13 +125,13 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> Maze {
     end_dst.insert(crr as u32, end_x - x + y_diff);
   }
 
-  let up_node = end as usize - width;
+  if pixels[end as usize - width] != 0 {
+    let (top_node, top_x) = top_nodes[&end_y];
 
-  if pixels[up_node] != 0 {
-    up_idx.insert(end, up_node as u32);
-    down_idx.insert(up_node as u32, end);
+    up_idx.insert(end, top_node);
+    down_idx.insert(top_node, end);
 
-    up_dst.insert(end, 1);
+    up_dst.insert(end, end_x - top_x);
   }
 
   Maze {
