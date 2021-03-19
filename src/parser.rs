@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 #[derive(Default, Clone, Copy)]
 pub struct Node {
   pub up_idx: u32,
@@ -38,12 +36,12 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
 
   let mut nodes = vec![Node::default()];
 
-  let mut top_nodes = HashMap::new();
+  let mut top_nodes = vec![(0, 0); width];
   let mut left_node = 0u32;
   let mut left_node_idx = 0u32;
 
   nodes.push(Node { end_dst: end_x + y_diff, ..Node::default() });
-  top_nodes.insert(start, (1, 0));
+  top_nodes[start as usize] = (1, 0);
 
   let mut crr = width;
   let mut left = crr - 1;
@@ -94,7 +92,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
     let new_node_idx = nodes.len() as u32;
 
     if up_white {
-      let (top_node_idx, top_x) = top_nodes[&y];
+      let (top_node_idx, top_x) = top_nodes[y as usize];
 
       new_node.up_idx = top_node_idx;
       nodes[top_node_idx as usize].down_idx = new_node_idx;
@@ -103,7 +101,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
     }
 
     if down_white {
-      top_nodes.insert(y, (new_node_idx, x));
+      top_nodes[y as usize] = (new_node_idx, x);
     }
 
     if left_white {
@@ -132,7 +130,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
   let end_node_idx = nodes.len() as u32;
 
   if pixels[end as usize - width] != 0 {
-    let (top_node_idx, top_x) = top_nodes[&end_y];
+    let (top_node_idx, top_x) = top_nodes[end_y as usize];
 
     end_node.up_idx = top_node_idx;
     nodes[top_node_idx as usize].down_idx = end_node_idx;
