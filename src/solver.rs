@@ -1,6 +1,5 @@
 use core::cmp::Ordering;
 use std::collections::BinaryHeap;
-use std::collections::HashMap;
 
 use crate::parser::*;
 
@@ -30,8 +29,8 @@ pub enum Dir {
   Right
 }
 
-pub fn solve(nodes: &[Node]) -> HashMap<u32, (u32, Dir)> {
-  let mut prev = HashMap::new();
+pub fn solve(nodes: &[Node]) -> Vec<(u32, Dir)> {
+  let mut prev = vec![(0, Dir::Up); nodes.len()];
 
   let mut g = vec![u32::MAX; nodes.len()];
   g[1] = 0;
@@ -55,8 +54,8 @@ pub fn solve(nodes: &[Node]) -> HashMap<u32, (u32, Dir)> {
       if g[crr_node.up_idx as usize] > new_g {
         g[crr_node.up_idx as usize] = new_g;
 
-        prev.insert(crr_node.up_idx, (crr_idx, Dir::Down));
-        heap.push(Entry { idx: crr_node.up_idx, f: new_g + nodes[crr_node.up_idx as usize].end_dst });
+        prev[crr_node.up_idx as usize] = (crr_idx, Dir::Down);
+        heap.push(Entry { idx: crr_node.up_idx, f: new_g + nodes[crr_node.up_idx as usize].end_dst })
       }
     }
 
@@ -66,8 +65,8 @@ pub fn solve(nodes: &[Node]) -> HashMap<u32, (u32, Dir)> {
       if g[crr_node.down_idx as usize] > new_g {
         g[crr_node.down_idx as usize] = new_g;
 
-        prev.insert(crr_node.down_idx, (crr_idx, Dir::Up));
-        heap.push(Entry { idx: crr_node.down_idx, f: new_g + nodes[crr_node.down_idx as usize].end_dst });
+        prev[crr_node.down_idx as usize] = (crr_idx, Dir::Up);
+        heap.push(Entry { idx: crr_node.down_idx, f: new_g + nodes[crr_node.down_idx as usize].end_dst })
       }
     }
 
@@ -77,8 +76,8 @@ pub fn solve(nodes: &[Node]) -> HashMap<u32, (u32, Dir)> {
       if g[crr_node.left_idx as usize] > new_g {
         g[crr_node.left_idx as usize] = new_g;
 
-        prev.insert(crr_node.left_idx, (crr_idx, Dir::Right));
-        heap.push(Entry { idx: crr_node.left_idx, f: new_g + nodes[crr_node.left_idx as usize].end_dst });
+        prev[crr_node.left_idx as usize] = (crr_idx, Dir::Right);
+        heap.push(Entry { idx: crr_node.left_idx, f: new_g + nodes[crr_node.left_idx as usize].end_dst })
       }
     }
 
@@ -88,8 +87,8 @@ pub fn solve(nodes: &[Node]) -> HashMap<u32, (u32, Dir)> {
       if g[crr_node.right_idx as usize] > new_g {
         g[crr_node.right_idx as usize] = new_g;
 
-        prev.insert(crr_node.right_idx, (crr_idx, Dir::Left));
-        heap.push(Entry { idx: crr_node.right_idx, f: new_g + nodes[crr_node.right_idx as usize].end_dst });
+        prev[crr_node.right_idx as usize] = (crr_idx, Dir::Left);
+        heap.push(Entry { idx: crr_node.right_idx, f: new_g + nodes[crr_node.right_idx as usize].end_dst })
       }
     }
   }
@@ -97,16 +96,18 @@ pub fn solve(nodes: &[Node]) -> HashMap<u32, (u32, Dir)> {
   panic!("No path found.")
 }
 
-pub fn make_path(width: u32, nodes: &[Node], prev: &HashMap<u32, (u32, Dir)>) -> (Vec<(u32, i32)>, u64) {
+pub fn make_path(width: u32, nodes: &[Node], prev: &Vec<(u32, Dir)>) -> (Vec<(u32, i32)>, u64) {
   let i_width = width as i32;
   let neg_width = -i_width;
 
-  let mut path = Vec::new();
+  let mut path = vec![];
   let mut path_length = 0u64;
 
   let mut crr_idx = nodes.len() as u32 - 1;
 
-  while let Some(&(prev_idx, dir)) = prev.get(&crr_idx) {
+  while prev[crr_idx as usize].0 != 0 {
+    let (prev_idx, dir) = prev[crr_idx as usize];
+
     match dir {
       Dir::Up => {
         let dst = nodes[crr_idx as usize].up_dst;
