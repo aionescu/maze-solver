@@ -1,7 +1,7 @@
 use core::cmp::Ordering;
 use std::collections::BinaryHeap;
 
-use crate::parser::*;
+use crate::parser::Node;
 
 #[derive(PartialEq, Eq)]
 struct Entry {

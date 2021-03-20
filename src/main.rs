@@ -7,8 +7,8 @@ use std::time::Instant;
 
 use image;
 
-use crate::parser::*;
-use crate::solver::*;
+use crate::parser::parse;
+use crate::solver::{solve, make_path, draw_path};
 
 macro_rules! timed {
   ($s:expr, $e:expr) => {
