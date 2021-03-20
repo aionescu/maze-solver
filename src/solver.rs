@@ -31,7 +31,6 @@ pub enum Dir {
   Right
 }
 
-#[allow(unreachable_code)]
 #[timed("Solving")]
 pub fn solve(nodes: &[Node]) -> Vec<(u32, Dir)> {
   let mut prev = vec![(0, Dir::Up); nodes.len()];

@@ -17,10 +17,10 @@ pub fn timed(args: TokenStream, input: TokenStream) -> TokenStream {
   let code = quote! {
     #(#attrs)*
     #vis #sig {
-      let mut f = move || #block;
+      let mut body = move || #block;
 
       let time = std::time::Instant::now();
-      let r = f();
+      let r = body();
       let elapsed = time.elapsed();
 
       println!("{} took {:?}.", #name, elapsed);
