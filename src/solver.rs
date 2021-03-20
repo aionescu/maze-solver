@@ -1,3 +1,5 @@
+use timed_proc_macro::timed;
+
 use core::cmp::Ordering;
 use std::collections::BinaryHeap;
 
@@ -29,6 +31,8 @@ pub enum Dir {
   Right
 }
 
+#[allow(unreachable_code)]
+#[timed("Solving")]
 pub fn solve(nodes: &[Node]) -> Vec<(u32, Dir)> {
   let mut prev = vec![(0, Dir::Up); nodes.len()];
 
@@ -96,6 +100,7 @@ pub fn solve(nodes: &[Node]) -> Vec<(u32, Dir)> {
   panic!("No path found.")
 }
 
+#[timed("Creating path")]
 pub fn make_path(width: u32, nodes: &[Node], prev: &Vec<(u32, Dir)>) -> (Vec<(u32, i32)>, u64) {
   let i_width = width as i32;
   let neg_width = -i_width;
@@ -137,6 +142,7 @@ pub fn make_path(width: u32, nodes: &[Node], prev: &Vec<(u32, Dir)>) -> (Vec<(u3
   (path, path_length)
 }
 
+#[timed("Drawing path")]
 pub fn draw_path(pixels: &mut Vec<u8>, path: &Vec<(u32, i32)>, path_length: u64, end: u32) {
   let mut color = 64.0;
   let color_step = 128.0 / path_length as f64;

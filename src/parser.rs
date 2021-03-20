@@ -1,3 +1,5 @@
+use timed_proc_macro::timed;
+
 #[derive(Default, Clone, Copy)]
 pub struct Node {
   pub up_idx: u32,
@@ -20,6 +22,7 @@ fn first_empty_pixel(pixels: &[u8], start_idx: usize, end_idx: usize) -> u32 {
   panic!("Invalid maze.")
 }
 
+#[timed("Parsing")]
 pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
   let max_y = width - 1;
 
