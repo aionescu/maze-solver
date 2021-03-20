@@ -5,7 +5,7 @@ use std::env::args;
 use std::path::Path;
 use std::time::Instant;
 
-use image;
+use image::{open, GrayImage};
 
 use crate::parser::parse;
 use crate::solver::{solve, make_path, draw_path};
@@ -23,19 +23,12 @@ macro_rules! timed {
 }
 
 fn load_luma8_parts(path: &str) -> (u32, u32, Vec<u8>) {
-  let img = image::open(path).unwrap();
-
-  let img =
-    match img {
-      image::ImageLuma8(luma8) => luma8,
-      _ => img.to_luma()
-    };
-
+  let img = open(path).unwrap().into_luma8();
   (img.width(), img.height(), img.into_raw())
 }
 
 fn save_luma8_parts(width: u32, height: u32, pixels: Vec<u8>, path: &str) {
-  let img = image::GrayImage::from_raw(width, height, pixels).unwrap();
+  let img = GrayImage::from_raw(width, height, pixels).unwrap();
   img.save(&path).unwrap()
 }
 
