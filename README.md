@@ -2,19 +2,22 @@
 
 High-performance maze solver written in Rust.
 
-*Inspired by Dr. Mike Pound's Computerphile [video](https://www.youtube.com/watch?v=rop0W4QDOUI).*
-
 ## Examples
 
 You can find some test mazes (along with their solutions) in the [Examples](Examples/) folder.
-
-They were taken from Mike Pound's [repository](https://github.com/mikepound/mazesolving).
 
 ## Building & running
 
 You will need `cargo`, which can be installed [here](https://rustup.rs/).
 
-To build and run the program, run `cargo run --release -- <path-to-maze>`.
+To build the project, run `cargo build --release`.
+
+To run the project, run `cargo run --quiet --release -- <path-to-maze>`.
+
+## Credits
+
+This project was inspired by Dr. Mike Pound's [Computerphile video](tps://www.youtube.com/watch?v=rop0W4QDOUI),
+and the example mazes were taken from his [mazesolving](https://github.com/mikepound/mazesolving) repository.
 
 ## License
 
