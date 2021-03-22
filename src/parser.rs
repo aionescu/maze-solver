@@ -1,14 +1,26 @@
 use timed_proc_macro::timed;
 
-#[derive(Default, Clone, Copy)]
+#[derive(Clone, Copy)]
+pub enum Dir {
+  Up,
+  Down,
+  Left,
+  Right
+}
+
+#[derive(Clone, Copy, Default)]
 pub struct Node {
-  pub up_idx: u32,
-  pub down_idx: u32,
-  pub left_idx: u32,
-  pub right_idx: u32,
+  pub left_dst: u32,
+  pub right_dst: u32,
 
   pub up_dst: u32,
-  pub left_dst: u32,
+  pub up_idx: u32,
+  pub down_dst: u32,
+  pub down_idx: u32,
+
+  pub g: u32,
+  pub prev: Option<Dir>,
+
   pub end_dst: u32
 }
 
@@ -38,12 +50,12 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
   let y_diff = (start as i32 - end_y as i32).abs() as u32;
 
   let mut nodes = vec![Node::default()];
+  nodes.reserve(width);
 
   let mut top_nodes = vec![(0, 0); width];
-  let mut left_node = 0u32;
   let mut left_node_idx = 0u32;
 
-  nodes.push(Node { end_dst: end_x + y_diff, ..Node::default() });
+  nodes.push(Node { end_dst: end_x + y_diff, g: 0, ..Node::default() });
   top_nodes[start as usize] = (1, 0);
 
   let mut crr = width;
@@ -91,16 +103,18 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
       continue
     }
 
-    let mut new_node = Node::default();
+    let mut new_node = Node { g: u32::MAX, ..Node::default() };
     let new_node_idx = nodes.len() as u32;
 
     if up_white {
       let (top_node_idx, top_x) = top_nodes[y as usize];
+      let dst = x - top_x;
 
+      new_node.up_dst = dst;
       new_node.up_idx = top_node_idx;
-      nodes[top_node_idx as usize].down_idx = new_node_idx;
 
-      new_node.up_dst = x - top_x
+      nodes[top_node_idx as usize].down_dst = dst;
+      nodes[top_node_idx as usize].down_idx = new_node_idx;
     }
 
     if down_white {
@@ -108,14 +122,13 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
     }
 
     if left_white {
-      new_node.left_idx = left_node;
-      nodes[left_node as usize].right_idx = new_node_idx;
+      let dst = crr as u32 - left_node_idx;
 
-      new_node.left_dst = crr as u32 - left_node_idx
+      new_node.left_dst = dst;
+      nodes[new_node_idx as usize - 1].right_dst = dst;
     }
 
     if right_white {
-      left_node = new_node_idx;
       left_node_idx = crr as u32
     }
 
@@ -127,6 +140,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
 
   let mut end_node = Node {
     end_dst: 0,
+    g: u32::MAX,
     ..Node::default()
   };
 
@@ -134,14 +148,14 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
 
   if pixels[end as usize - width] != 0 {
     let (top_node_idx, top_x) = top_nodes[end_y as usize];
+    let dst = end_x - top_x;
 
+    end_node.up_dst = dst;
     end_node.up_idx = top_node_idx;
+    nodes[top_node_idx as usize].down_dst = dst;
     nodes[top_node_idx as usize].down_idx = end_node_idx;
-
-    end_node.up_dst = end_x - top_x;
   }
 
   nodes.push(end_node);
-
   (nodes, end)
 }

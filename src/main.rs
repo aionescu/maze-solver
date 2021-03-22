@@ -42,10 +42,10 @@ fn main() {
 
   let (width, height, mut pixels) = load_luma8_parts(&img_path);
 
-  let (nodes, end) = parse(width, height, &pixels);
-  let prev = solve(&nodes);
+  let (mut nodes, end) = parse(width, height, &pixels);
+  solve(&mut nodes);
 
-  let (path, path_length) = make_path(width, &nodes, &prev);
+  let (path, path_length) = make_path(width, &nodes);
   draw_path(&mut pixels, &path, path_length, end);
 
   save_luma8_parts(width, height, pixels, &solution_path);

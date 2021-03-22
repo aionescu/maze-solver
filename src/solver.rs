@@ -3,7 +3,7 @@ use timed_proc_macro::timed;
 use core::cmp::Ordering;
 use std::collections::BinaryHeap;
 
-use crate::parser::Node;
+use crate::parser::{Dir, Node};
 
 #[derive(PartialEq, Eq)]
 struct Entry {
@@ -23,21 +23,8 @@ impl Ord for Entry {
   }
 }
 
-#[derive(Clone, Copy)]
-pub enum Dir {
-  Up,
-  Down,
-  Left,
-  Right
-}
-
 #[timed("Solving")]
-pub fn solve(nodes: &[Node]) -> Vec<(u32, Dir)> {
-  let mut prev = vec![(0, Dir::Up); nodes.len()];
-
-  let mut g = vec![u32::MAX; nodes.len()];
-  g[1] = 0;
-
+pub fn solve(nodes: &mut [Node]) {
   let mut heap = BinaryHeap::new();
   heap.push(Entry { idx: 1, f: nodes[1].end_dst });
 
@@ -45,53 +32,56 @@ pub fn solve(nodes: &[Node]) -> Vec<(u32, Dir)> {
 
   while let Some(Entry{ idx: crr_idx, .. }) = heap.pop() {
     if crr_idx == end_idx {
-      return prev
+      return
     }
 
-    let g_crr = g[crr_idx as usize];
     let crr_node = nodes[crr_idx as usize];
 
-    if crr_node.up_idx != 0 {
-      let new_g = g_crr + crr_node.up_dst;
+    if crr_node.left_dst != 0 {
+      let new_g = crr_node.g + crr_node.left_dst;
+      let left_node = &mut nodes[crr_idx as usize - 1];
 
-      if g[crr_node.up_idx as usize] > new_g {
-        g[crr_node.up_idx as usize] = new_g;
+      if left_node.g > new_g {
+        left_node.g = new_g;
+        left_node.prev = Some(Dir::Right);
 
-        prev[crr_node.up_idx as usize] = (crr_idx, Dir::Down);
-        heap.push(Entry { idx: crr_node.up_idx, f: new_g + nodes[crr_node.up_idx as usize].end_dst })
+        heap.push(Entry { idx: crr_idx - 1, f: new_g + left_node.end_dst })
       }
     }
 
-    if crr_node.down_idx != 0 {
-      let new_g = g_crr + nodes[crr_node.down_idx as usize].up_dst;
+    if crr_node.right_dst != 0 {
+      let new_g = crr_node.g + crr_node.right_dst;
+      let right_node = &mut nodes[crr_idx as usize + 1];
 
-      if g[crr_node.down_idx as usize] > new_g {
-        g[crr_node.down_idx as usize] = new_g;
+      if right_node.g > new_g {
+        right_node.g = new_g;
+        right_node.prev = Some(Dir::Left);
 
-        prev[crr_node.down_idx as usize] = (crr_idx, Dir::Up);
-        heap.push(Entry { idx: crr_node.down_idx, f: new_g + nodes[crr_node.down_idx as usize].end_dst })
+        heap.push(Entry { idx: crr_idx + 1, f: new_g + right_node.end_dst })
       }
     }
 
-    if crr_node.left_idx != 0 {
-      let new_g = g_crr + crr_node.left_dst;
+    if crr_node.up_dst != 0 {
+      let new_g = crr_node.g + crr_node.up_dst;
+      let up_node = &mut nodes[crr_node.up_idx as usize];
 
-      if g[crr_node.left_idx as usize] > new_g {
-        g[crr_node.left_idx as usize] = new_g;
+      if up_node.g > new_g {
+        up_node.g = new_g;
+        up_node.prev = Some(Dir::Down);
 
-        prev[crr_node.left_idx as usize] = (crr_idx, Dir::Right);
-        heap.push(Entry { idx: crr_node.left_idx, f: new_g + nodes[crr_node.left_idx as usize].end_dst })
+        heap.push(Entry { idx: crr_node.up_idx, f: new_g + up_node.end_dst })
       }
     }
 
-    if crr_node.right_idx != 0 {
-      let new_g = g_crr + nodes[crr_node.right_idx as usize].left_dst;
+    if crr_node.down_dst != 0 {
+      let new_g = crr_node.g + crr_node.down_dst;
+      let down_node = &mut nodes[crr_node.down_idx as usize];
 
-      if g[crr_node.right_idx as usize] > new_g {
-        g[crr_node.right_idx as usize] = new_g;
+      if down_node.g > new_g {
+        down_node.g = new_g;
+        down_node.prev = Some(Dir::Up);
 
-        prev[crr_node.right_idx as usize] = (crr_idx, Dir::Left);
-        heap.push(Entry { idx: crr_node.right_idx, f: new_g + nodes[crr_node.right_idx as usize].end_dst })
+        heap.push(Entry { idx: crr_node.down_idx, f: new_g + down_node.end_dst })
       }
     }
   }
@@ -100,42 +90,46 @@ pub fn solve(nodes: &[Node]) -> Vec<(u32, Dir)> {
 }
 
 #[timed("Creating path")]
-pub fn make_path(width: u32, nodes: &[Node], prev: &Vec<(u32, Dir)>) -> (Vec<(u32, i32)>, u64) {
+pub fn make_path(width: u32, nodes: &[Node]) -> (Vec<(u32, i32)>, u64) {
   let i_width = width as i32;
   let neg_width = -i_width;
 
   let mut path = vec![];
   let mut path_length = 0u64;
 
-  let mut crr_idx = nodes.len() as u32 - 1;
+  let mut crr_idx = nodes.len() - 1;
+  let mut crr_node = nodes[crr_idx];
 
-  while prev[crr_idx as usize].0 != 0 {
-    let (prev_idx, dir) = prev[crr_idx as usize];
+  while let Some(dir) = crr_node.prev {
+    let dst;
+    let step;
 
     match dir {
       Dir::Up => {
-        let dst = nodes[crr_idx as usize].up_dst;
-        path.push((dst, neg_width));
-        path_length += dst as u64
+        dst = crr_node.up_dst;
+        step = neg_width;
+        crr_idx = crr_node.up_idx as usize;
       },
       Dir::Down => {
-        let dst = nodes[prev_idx as usize].up_dst;
-        path.push((dst, i_width));
-        path_length += dst as u64
+        dst = crr_node.down_dst;
+        step = i_width;
+        crr_idx = crr_node.down_idx as usize;
       },
       Dir::Left => {
-        let dst = nodes[crr_idx as usize].left_dst;
-        path.push((dst, -1));
-        path_length += dst as u64
+        dst = crr_node.left_dst;
+        step = -1;
+        crr_idx = crr_idx - 1;
       },
       Dir::Right => {
-        let dst = nodes[prev_idx as usize].left_dst;
-        path.push((dst, 1));
-        path_length += dst as u64
+        dst = crr_node.right_dst;
+        step = 1;
+        crr_idx = crr_idx + 1;
       }
     }
 
-    crr_idx = prev_idx
+    path.push((dst, step));
+    path_length += dst as u64;
+    crr_node = nodes[crr_idx]
   }
 
   (path, path_length)
