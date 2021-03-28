@@ -114,18 +114,18 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
       new_node.up_idx = top_node_idx;
 
       nodes[top_node_idx as usize].down_dst = dst;
-      nodes[top_node_idx as usize].down_idx = new_node_idx;
+      nodes[top_node_idx as usize].down_idx = new_node_idx
     }
 
     if down_white {
-      top_nodes[y as usize] = (new_node_idx, x);
+      top_nodes[y as usize] = (new_node_idx, x)
     }
 
     if left_white {
       let dst = crr as u32 - left_node_idx;
 
       new_node.left_dst = dst;
-      nodes[new_node_idx as usize - 1].right_dst = dst;
+      nodes[new_node_idx as usize - 1].right_dst = dst
     }
 
     if right_white {
@@ -153,7 +153,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
     end_node.up_dst = dst;
     end_node.up_idx = top_node_idx;
     nodes[top_node_idx as usize].down_dst = dst;
-    nodes[top_node_idx as usize].down_idx = end_node_idx;
+    nodes[top_node_idx as usize].down_idx = end_node_idx
   }
 
   nodes.push(end_node);

@@ -108,22 +108,22 @@ pub fn make_path(width: u32, nodes: &[Node]) -> (Vec<(u32, i32)>, u64) {
       Dir::Up => {
         dst = crr_node.up_dst;
         step = neg_width;
-        crr_idx = crr_node.up_idx as usize;
+        crr_idx = crr_node.up_idx as usize
       },
       Dir::Down => {
         dst = crr_node.down_dst;
         step = i_width;
-        crr_idx = crr_node.down_idx as usize;
+        crr_idx = crr_node.down_idx as usize
       },
       Dir::Left => {
         dst = crr_node.left_dst;
         step = -1;
-        crr_idx = crr_idx - 1;
+        crr_idx = crr_idx - 1
       },
       Dir::Right => {
         dst = crr_node.right_dst;
         step = 1;
-        crr_idx = crr_idx + 1;
+        crr_idx = crr_idx + 1
       }
     }
 
@@ -147,7 +147,7 @@ pub fn draw_path(pixels: &mut Vec<u8>, path: &Vec<(u32, i32)>, path_length: u64,
       pixels[crr_idx as usize] = color as u8;
       color += color_step;
 
-      crr_idx = (crr_idx as i64 + step as i64) as u32;
+      crr_idx = (crr_idx as i64 + step as i64) as u32
     }
   }
 
