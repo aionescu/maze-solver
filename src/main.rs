@@ -7,17 +7,19 @@ use std::path::{Path, PathBuf};
 
 use image::{open, GrayImage};
 
+#[cfg(feature = "show-timings")]
 use timed_proc_macro::timed;
+
 use crate::parser::parse;
 use crate::solver::{solve, make_path, draw_path};
 
-#[timed("Loading")]
+#[cfg_attr(feature = "show-timings", timed("Loading"))]
 fn load_luma8_parts<P: AsRef<Path>>(path: P) -> (u32, u32, Vec<u8>) {
   let img = open(path).unwrap().into_luma8();
   (img.width(), img.height(), img.into_raw())
 }
 
-#[timed("Saving")]
+#[cfg_attr(feature = "show-timings", timed("Saving"))]
 fn save_luma8_parts<P: AsRef<Path>>(width: u32, height: u32, pixels: Vec<u8>, path: P) {
   let img = GrayImage::from_raw(width, height, pixels).unwrap();
   img.save(&path).unwrap()
@@ -35,7 +37,7 @@ fn append_solved(path: &str) -> PathBuf {
     .to_owned()
 }
 
-#[timed("Total")]
+#[cfg_attr(feature = "show-timings", timed("Total"))]
 fn main() {
   let img_path = args().nth(1).expect("Please specify the maze file as a command-line argument.");
   let solution_path = append_solved(&img_path);
