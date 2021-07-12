@@ -4,6 +4,10 @@ use syn::{AttributeArgs, ItemFn};
 
 #[proc_macro_attribute]
 pub fn timed(args: TokenStream, input: TokenStream) -> TokenStream {
+  if cfg!(not(feature = "enabled")) {
+    return input
+  }
+
   let args = syn::parse_macro_input!(args as AttributeArgs);
   let fun = syn::parse_macro_input!(input as ItemFn);
 

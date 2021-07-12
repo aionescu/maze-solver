@@ -1,9 +1,6 @@
 use core::cmp::Ordering;
 use std::collections::BinaryHeap;
-
-#[cfg(feature = "show-timings")]
 use timed_proc_macro::timed;
-
 use crate::parser::{Dir, Node};
 
 #[derive(PartialEq, Eq)]
@@ -24,7 +21,7 @@ impl Ord for Entry {
   }
 }
 
-#[cfg_attr(feature = "show-timings", timed("Solving"))]
+#[timed("Solving")]
 pub fn solve(nodes: &mut [Node]) {
   let mut heap = BinaryHeap::new();
   heap.push(Entry { idx: 1, f: nodes[1].end_dst });
@@ -90,7 +87,7 @@ pub fn solve(nodes: &mut [Node]) {
   panic!("No path found.")
 }
 
-#[cfg_attr(feature = "show-timings", timed("Creating path"))]
+#[timed("Creating path")]
 pub fn make_path(width: u32, nodes: &[Node]) -> (Vec<(u32, i32)>, u64) {
   let i_width = width as i32;
   let neg_width = -i_width;
@@ -136,7 +133,7 @@ pub fn make_path(width: u32, nodes: &[Node]) -> (Vec<(u32, i32)>, u64) {
   (path, path_length)
 }
 
-#[cfg_attr(feature = "show-timings", timed("Drawing path"))]
+#[timed("Drawing path")]
 pub fn draw_path(pixels: &mut Vec<u8>, path: &Vec<(u32, i32)>, path_length: u64, end: u32) {
   let mut color = 64.0;
   let color_step = 128.0 / path_length as f64;

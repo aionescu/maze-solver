@@ -1,4 +1,3 @@
-#[cfg(feature = "show-timings")]
 use timed_proc_macro::timed;
 
 #[derive(Clone, Copy)]
@@ -35,7 +34,7 @@ fn first_empty_pixel(pixels: &[u8], start_idx: usize, end_idx: usize) -> u32 {
   panic!("Invalid maze.")
 }
 
-#[cfg_attr(feature = "show-timings", timed("Parsing"))]
+#[timed("Parsing")]
 pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
   let max_y = width - 1;
 
