@@ -27,7 +27,7 @@ pub fn timed(args: TokenStream, input: TokenStream) -> TokenStream {
       let r = body();
       let elapsed = time.elapsed();
 
-      println!("{} took {:?}.", #name, elapsed);
+      println!("{}: {:?}", #name, elapsed);
       r
     }
   };

@@ -28,7 +28,7 @@ fn append_solved(path: &str) -> PathBuf {
   let ext = path.extension().and_then(OsStr::to_str).unwrap_or("");
 
   path
-    .with_file_name(format!("{}-Solved", stem))
+    .with_file_name(format!("{}-solved", stem))
     .with_extension(ext)
     .to_owned()
 }
@@ -47,5 +47,5 @@ fn main() {
   draw_path(&mut pixels, &path, path_length, end);
 
   save_luma8_parts(width, height, pixels, &solution_path);
-  println!("Solution saved to {}.", solution_path.display())
+  println!("Solution saved to {}", solution_path.display())
 }

@@ -10,8 +10,8 @@ edition = "2021"
 proc-macro = true
 
 [dependencies]
-syn = { version = "1.0.64", features= ["full"] }
-quote = "1.0.9"
+syn = { version = "1.0.109", features = ["full"] }
+quote = "1.0.28"
 
 [features]
 enabled = []
