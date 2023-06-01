@@ -2,9 +2,9 @@
 
 High-performance maze solver written in Rust.
 
-## Examples
+## Maze examples
 
-You can find some test mazes (along with their solutions) in the [Examples](Examples/) folder.
+You can find some test mazes (along with their solutions) in the [mazes](mazes) directory.
 
 ## Building & running
 
@@ -22,4 +22,5 @@ and the example mazes were taken from his [mazesolving](https://github.com/mikep
 ## License
 
 This repository is licensed under the terms of the GNU General Public License v3.
+
 For more details, see [the license file](LICENSE.txt).
