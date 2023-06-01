@@ -1,12 +1,7 @@
 use timed_proc_macro::timed;
 
 #[derive(Clone, Copy)]
-pub enum Dir {
-  Up,
-  Down,
-  Left,
-  Right
-}
+pub enum Dir { Up, Down, Left, Right }
 
 #[derive(Clone, Copy, Default)]
 pub struct Node {
@@ -34,7 +29,7 @@ fn first_empty_pixel(pixels: &[u8], start_idx: usize, end_idx: usize) -> u32 {
   panic!("Invalid maze.")
 }
 
-#[timed("Parsing")]
+#[timed]
 pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
   let max_y = width - 1;
 
@@ -49,13 +44,13 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
   let end_y = end % width as u32;
   let y_diff = (start as i32 - end_y as i32).abs() as u32;
 
-  let mut nodes = vec![Node::default()];
-  nodes.reserve(width);
+  let mut nodes = Vec::with_capacity(width);
+  nodes.push(Node::default());
 
   let mut top_nodes = vec![(0, 0); width];
   let mut left_node_idx = 0u32;
 
-  nodes.push(Node { end_dst: end_x + y_diff, g: 0, ..Node::default() });
+  nodes.push(Node{end_dst: end_x + y_diff, g: 0, ..Node::default()});
   top_nodes[start as usize] = (1, 0);
 
   let mut crr = width;
@@ -103,7 +98,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
       continue
     }
 
-    let mut new_node = Node { g: u32::MAX, ..Node::default() };
+    let mut new_node = Node{g: u32::MAX, ..Node::default()};
     let new_node_idx = nodes.len() as u32;
 
     if up_white {
@@ -138,12 +133,7 @@ pub fn parse(width: u32, height: u32, pixels: &[u8]) -> (Vec<Node>, u32) {
     nodes.push(new_node)
   }
 
-  let mut end_node = Node {
-    end_dst: 0,
-    g: u32::MAX,
-    ..Node::default()
-  };
-
+  let mut end_node = Node{end_dst: 0, g: u32::MAX, ..Node::default()};
   let end_node_idx = nodes.len() as u32;
 
   if pixels[end as usize - width] != 0 {
